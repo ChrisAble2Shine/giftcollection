@@ -18,11 +18,21 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         . . . . . . . . . . . . . . . . 
         `, mySprite, 250, 0)
 })
+statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
+    sprites.destroy(statusbar.spriteAttachedTo())
+})
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
+    sprites.destroy(sprite)
+    statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -15
+    info.changeScoreBy(1)
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
     sprites.destroy(otherSprite, effects.disintegrate, 500)
+    scene.cameraShake(4, 500)
 })
 let ship: Sprite = null
+let statusbar: StatusBarSprite = null
 let projectile: Sprite = null
 let mySprite: Sprite = null
 effects.clouds.startScreenEffect()
@@ -45,9 +55,10 @@ mySprite = sprites.create(img`
     . . . . f f f f f f f . . . . . 
     . . . . f f f . . . . . . . . . 
     `, SpriteKind.Player)
-controller.moveSprite(mySprite, 500, 500)
-scene.cameraFollowSprite(mySprite)
-info.setLife(60)
+controller.moveSprite(mySprite, 200, 200)
+mySprite.setStayInScreen(true)
+info.setLife(1000000)
+let enemySpeed = 20
 game.onUpdateInterval(5000, function () {
     ship = sprites.create(img`
         . . . . . . . . . . . . . . . . 
@@ -68,6 +79,9 @@ game.onUpdateInterval(5000, function () {
         . . . . . . . . . . . . . . . . 
         `, SpriteKind.Enemy)
     ship.x = scene.screenWidth()
-    ship.vx = -20
+    ship.vx = 0 - enemySpeed
     ship.y = randint(0, scene.screenHeight() - 0)
+    statusbar = statusbars.create(20, 4, StatusBarKind.EnemyHealth)
+    statusbar.setColor(5, 10)
+    statusbar.attachToSprite(ship)
 })
