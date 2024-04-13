@@ -19,7 +19,29 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `, mySprite, 250, 0)
+        `, mySprite, 1000, 0)
+    if (doubleFireMode && doubleFireMode.lifespan > 0) {
+        projectile.y += -5
+        projectile = sprites.createProjectileFromSprite(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . 2 2 2 . . . . . . . . . . . 
+            . . 2 2 2 . . . . . . . . . . . 
+            . . 2 2 2 2 . . . . . . . 5 . . 
+            . . 2 2 2 2 . . . . . . . 5 5 . 
+            . . f f f f f f f f f f f f 5 5 
+            . . 2 2 2 2 . . . . . . . 5 5 . 
+            . . 2 2 2 2 . . . . . . . 5 . . 
+            . . 2 2 2 2 . . . . . . . . . . 
+            . . 2 2 2 . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, mySprite, 1000, 0)
+        projectile.y += 5
+    }
 })
 statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
     enemyDeath(statusbar.spriteAttachedTo())
@@ -50,7 +72,26 @@ function enemyDeath (enemy: Sprite) {
     }
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.PowerUP, function (sprite, otherSprite) {
-	
+    doubleFireMode = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . 9 9 9 9 9 9 9 . . . 
+        . . . . . 9 9 9 9 9 9 5 9 9 . . 
+        . 9 9 9 9 9 9 9 5 5 5 9 9 9 . . 
+        . . . . . 9 9 9 9 9 9 9 9 9 . . 
+        . . . . . . . 9 9 9 9 . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . 9 9 9 9 9 . . 
+        . . . . . . 9 9 9 9 9 9 9 5 9 . 
+        . 9 9 9 9 9 9 9 9 5 5 5 5 5 9 . 
+        . 9 . . . 9 9 9 9 9 9 9 9 9 9 . 
+        . . . . . . 9 9 9 9 9 9 9 9 9 . 
+        . . . . . . . . . 9 9 9 9 9 . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.Player)
+    doubleFireMode.setPosition(28, 5)
+    doubleFireMode.lifespan = 9000
 })
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprites.destroy(sprite)
@@ -65,9 +106,10 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 let ship: Sprite = null
 let powerUp: Sprite = null
 let statusbar: StatusBarSprite = null
+let doubleFireMode: Sprite = null
 let projectile: Sprite = null
 let mySprite: Sprite = null
-effects.clouds.startScreenEffect()
+effects.smiles.startScreenEffect()
 scene.setBackgroundColor(9)
 mySprite = sprites.create(img`
     . . . . . . . . . . . . . . . . 
@@ -87,10 +129,10 @@ mySprite = sprites.create(img`
     . . . . f f f f f f f . . . . . 
     . . . . f f f . . . . . . . . . 
     `, SpriteKind.Player)
-controller.moveSprite(mySprite, 200, 200)
+controller.moveSprite(mySprite, 100, 100)
 mySprite.setStayInScreen(true)
-info.setLife(1000000)
-let enemySpeed = 20
+info.setLife(10000)
+let enemySpeed = 30
 let enemySpawnTime = 2000
 game.onUpdateInterval(5000, function () {
     enemySpeed += 10
@@ -118,7 +160,7 @@ forever(function () {
         . . . . . . . . . . . . . . . . 
         `, SpriteKind.Enemy)
     ship.x = scene.screenWidth()
-    ship.vx = 0 - enemySpeed
+    ship.vx = 1 - enemySpeed
     ship.y = randint(0, scene.screenHeight() - 0)
     statusbar = statusbars.create(20, 4, StatusBarKind.EnemyHealth)
     statusbar.setColor(5, 10)
